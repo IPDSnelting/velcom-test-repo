@@ -7,7 +7,7 @@
             "error": "Failed to fraburgle the kitabonga"
         },
         "Lines C++ with % and many äöüß& special chars <img src=x onerror=alert(1)>": {
-            "error": "Unicode is not a solved problem!"
+            "error": "Unicode is not a solved problem!!"
         }
     }
 }
