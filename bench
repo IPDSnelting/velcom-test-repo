@@ -2,54 +2,44 @@
 
 import sys
 import subprocess
-from noise import pnoise1
 from typing import Dict, Any, List
 import json
 import random
 
 
-def random_noise(value: float) -> float:
-    return pnoise1(
-        value,
-        octaves=1,
-        persistence=0.5,
-        lacunarity=2.0,
-        repeat=20_000,
-        base=0
-    )
-
-
 def noisy_value(value: float) -> List[float]:
     return [
-        random.uniform(value*0.5, value*1.5) for _ in range(0, random.randint(1, 10))
+        round(random.uniform(value*0.5, value*1.5), 3) for _ in range(0, random.randint(1, 10))
     ]
 
-
-benchmarks = ["BenchMe", "Beat this"]
-metrics = [
-    ("cats in the cradle", "dogs", "LESS_IS_BETTER", 15),
-    ("oracle", "pain", "LESS_IS_BETTER", 20),
-    ("magic", "wtf/min", "MORE_IS_BETTER", 5),
-    ("size", "lines", "NEUTRAL", 10)
-]
+dimensions = {
+    "backend": [
+        ("build_time", 120, "seconds", "LESS_IS_BETTER"),
+        ("sloc", 20_000, "lines", "NEUTRAL"),
+        ("coverage", 40, "percent", "MORE_IS_BETTER")
+    ],
+    "frontend": [
+        ("build_time", 230, "seconds", "LESS_IS_BETTER"),
+        ("sloc", 13_000, "lines", "NEUTRAL")
+    ]
+}
 
 if __name__ == '__main__':
     commit_number = int(subprocess.check_output(
-        ["git", "-C", sys.argv[1], "show", "-s", "--format=%s", "HEAD"]
-    ))
+        ["git", "-C", sys.argv[1], "show", "-s", "--format=%H", "HEAD"]
+    ), 16)
 
     random.seed(commit_number)
 
     result: Dict[str, Any] = {}
 
-    for benchmark in benchmarks:
+    for benchmark, metrics in dimensions.items():
         benchmark_result: Dict[str, Any] = {}
         result[benchmark] = benchmark_result
 
-        for metric, unit, interpretation, scale in metrics:
-            value = random_noise(commit_number / 117) * scale
+        for metric, median, unit, interpretation in metrics:
             metric_result = {
-                "results": noisy_value(value),
+                "results": noisy_value(median),
                 "unit": unit,
                 "resultInterpretation": interpretation,
             }
